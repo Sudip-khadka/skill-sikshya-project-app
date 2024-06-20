@@ -1,0 +1,71 @@
+.table-headers, .show-rows-per-page, .search-containers{
+    display: flex;
+    align-items: center;
+    height: 10vh;
+    color: #363637;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: left;
+}
+.table{
+    background-color: #ffffff;
+    width:100%;
+    padding:10px;
+    border-radius: 10px;
+    height:calc(100vh - 20vh - 60px);
+}
+.table-headers{
+    width: 100%;
+    justify-content: space-between;
+
+}
+.search-containers{
+    gap:10px;
+}
+.show-rows-per-page{
+    gap: 10px;
+}
+
+.date-picker{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-date-picker {
+    height: 100% !important;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.ant-picker {
+    width: 100%;
+    height: 100%;
+}
+.label{
+font-family: Be Vietnam Pro;
+font-size: 16px;
+font-weight: 400;
+line-height: 24px;
+text-align: left;
+
+}
+.ant-picker-input input {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    font-size: 16px !important;
+}
+.ant-picker.ant-picker-range.ant-picker-outlined.css-dev-only-do-not-override-m4timi{
+    padding:7px;
+}
+.MuiSelect-select.MuiSelect-outlined.MuiInputBase-input.MuiOutlinedInput-input.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
+    padding: 8px;
+    width:150px;
+}
+.css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root{
+    top:-8px !important;
+}

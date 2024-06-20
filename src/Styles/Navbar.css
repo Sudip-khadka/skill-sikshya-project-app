@@ -1,0 +1,37 @@
+nav{
+    width:100%;
+display: flex;
+justify-content: center;
+align-items: center;
+padding:25px 0px;
+height:10vh;
+}
+.navbar{
+width: 95%;
+background-color: #ffffff;
+display: flex;
+justify-content: flex-end;
+align-items: center;
+flex-wrap: wrap;
+
+}
+.profile{
+    display:flex;
+    align-items: center;
+    top: 20px;
+    left: 1297px;
+    gap: 8px;
+
+}
+.profile-image{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    height:40px;
+    width:40px;
+    border-radius: 50%;
+    background-color: #B80084;
+}
+.profile-image h1{
+    color:white;
+}

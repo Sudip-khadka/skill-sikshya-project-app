@@ -1,0 +1,16 @@
+.product-categories{
+    display:flex;
+    flex-direction: column;
+    width:100%;
+}
+.product-categories-header{
+    width:100%;
+    display:flex;
+    justify-content: space-between;
+}
+.btn{
+    background-color: #082D4A;
+    padding:10px 20px;
+    color:aliceblue;
+    border-radius: 8px;
+}
