@@ -3,7 +3,7 @@ import StickyHeadTable from './OrderTable'
 
 function OrderTableBody() {
   return (
-    <div>
+    <div className='table-body'>
       <StickyHeadTable/>
     </div>
   )

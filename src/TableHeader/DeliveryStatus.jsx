@@ -10,11 +10,27 @@ export default function DeliveryStatus() {
   const handleChange = (event) => {
     setDeliveryStatus(event.target.value);
   };
+  const getColor = (status) => {
+    switch (status) {
+      case 'delivered':
+        return 'green';
+      case 'pending':
+        return 'blue';
+      case 'canceled':
+        return 'red';
+      case 'shipped':
+        return '#FF785A';
+      default:
+        return 'default';
+    }
+  };
 
   return (
     <div>
       <FormControl sx={{ m: 1, minWidth: 80 }}>
-        <InputLabel id="demo-simple-select-autowidth-label">Delivery Status</InputLabel>
+        <InputLabel 
+        id="demo-simple-select-autowidth-label"
+        sx={{ color: getColor(deliveryStatus) }}>Delivery Status</InputLabel>
         <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
@@ -22,6 +38,18 @@ export default function DeliveryStatus() {
           onChange={handleChange}
           autoWidth
           label="Delivery Status"
+          sx={{
+            color: getColor(deliveryStatus),
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: getColor(deliveryStatus),
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: getColor(deliveryStatus),
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: getColor(deliveryStatus),
+            },
+          }}
         >
           <MenuItem value="">
             <em>None</em>

@@ -17,9 +17,7 @@ function Orders() {
       <div className="table">
 
       <OrderHeaders/>
-      <div className="table-body">
         <OrderTableBody/>
-      </div>
       </div>
     </div>
   )

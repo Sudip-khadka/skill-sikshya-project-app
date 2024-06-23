@@ -11,10 +11,29 @@ export default function PaymentStatus() {
     setPaymentStatus(event.target.value);
   };
 
+  // Define colors based on payment status
+  const getColor = (status) => {
+    switch (status) {
+      case 'paid':
+        return 'green';
+      case 'cod':
+        return 'blue';
+      case 'refunded':
+        return 'red';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <div>
-      <FormControl sx={{ m: 1, minWidth: 80 }}>
-        <InputLabel id="demo-simple-select-autowidth-label">Payment Status</InputLabel>
+      <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <InputLabel
+          id="demo-simple-select-autowidth-label"
+          sx={{ color: getColor(paymentStatus) }}
+        >
+          Payment Status
+        </InputLabel>
         <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
@@ -22,6 +41,18 @@ export default function PaymentStatus() {
           onChange={handleChange}
           autoWidth
           label="Payment Status"
+          sx={{
+            color: getColor(paymentStatus),
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: getColor(paymentStatus),
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: getColor(paymentStatus),
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: getColor(paymentStatus),
+            },
+          }}
         >
           <MenuItem value="">
             <em>None</em>
