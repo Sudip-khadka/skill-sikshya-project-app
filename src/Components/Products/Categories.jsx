@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Products.css';
-import FormDialog from './Popups/CategoryPopUP';
+import FormDialog from '../Popups/CategoryPopUP';
 
 function Categories() {
   // Define state to control the visibility of the FormDialog
