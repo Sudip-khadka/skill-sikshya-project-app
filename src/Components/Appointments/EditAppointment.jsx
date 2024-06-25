@@ -4,24 +4,53 @@ import { DataGrid } from '@mui/x-data-grid';
 import ControlledSwitches from './Switch'; // Make sure to import the correct path for ControlledSwitches
 
 const url = 'https://retoolapi.dev/ONeFE7/data';
+const url2 = 'https://retoolapi.dev/vor7Zw/data';
 
 const EditAppointment = () => {
   const [rows, setRows] = useState([]);
 
+  const splitDateTime = (dateTime) => {
+    if (!dateTime) return { date: 'N/A', time: 'N/A' };
+    const [date, time] = dateTime.split(' ');
+    const timeWithMeridiem = `${time} ${dateTime.split(' ')[3]}`;
+    return { date: `${date} ${dateTime.split(' ')[1]} ${dateTime.split(' ')[2]}`, time: timeWithMeridiem };
+  };
+
   useEffect(() => {
-    axios.get(url).then((response) => {
-      const fetchedData = response.data.map((item) => ({
-        id: item.id,
-        sn: item.id,
-        serviceType: 'Hair Transplant',
-        timeSlots: item.timeslots,
-        name: `${item.name}\n${item.phone}\n${item.email}`,
-        number: item.staffs,
-        fees: `Rs.${item.serviceFees}`,
-        active: true, // Default to active
-      }));
-      setRows(fetchedData);
-    });
+    const fetchData = async () => {
+      try {
+        const [response1, response2] = await Promise.all([axios.get(url), axios.get(url2)]);
+        console.log('Response 1 data:', response1.data);
+        console.log('Response 2 data:', response2.data);
+
+        // Create a map from response2 data using the id as the key
+        const response2Map = new Map(response2.data.map(item => [item.id, item]));
+
+        // Merge the data from response1 and response2
+        const combinedData = response1.data.map((item, index) => {
+          let serviceFees = item.number * 200;
+          const { date, time } = splitDateTime(item.date);
+          const response2Item = response2Map.get(item.id) || {};
+          return {
+            id: item.id,
+            sn: index + 1, // Use index + 1 for a sequential S.N
+            serviceType: 'Hair Transplant',
+            timeSlots: `${date}n${time}` || 'N/A', // Provide a default value
+            name: `${item.name || 'N/A'}\n${item.phone || 'N/A'}\n${item.email || 'N/A'}`,
+            number: item.number !== undefined ? item.number : 'N/A', // Provide a default value
+            fees: `Rs.${serviceFees !== undefined ? serviceFees : 'N/A'}`, // Provide a default value
+            active: response2Item.boolean !== undefined ? response2Item.boolean : true, // Default to active
+          };
+        });
+
+        console.log('Combined data:', combinedData);
+        setRows(combinedData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleSwitchToggle = (id) => {
@@ -32,7 +61,6 @@ const EditAppointment = () => {
   };
 
   const getRowClassName = (params) => {
-    console.log(params)
     return params.row.active ? '' : 'disabled-row';
   };
 
@@ -77,7 +105,7 @@ const EditAppointment = () => {
       renderCell: (params) => (
         <ControlledSwitches
           checked={params.row.active} // Pass row-specific active state
-            onChange={()=>getRowClassName(params)}
+          onChange={() => handleSwitchToggle(params.row.id)}
         />
       ),
     },
@@ -88,7 +116,6 @@ const EditAppointment = () => {
       <style>
         {`
           .disabled-row {
-            pointer-events: none;
             opacity: 0.5;
             background-color: #f5f5f5; /* Optional: Make it more noticeable */
           }
