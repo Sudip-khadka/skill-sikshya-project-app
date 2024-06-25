@@ -173,7 +173,7 @@ function EndIcon() {
 }
 
 export default function GmailTreeView() {
-    const [selectedItem, setSelectedItem] = useState(() => localStorage.getItem('selectedItem') || '1');
+    const [selectedItem, setSelectedItem] = useState(() => localStorage.getItem('selectedItem') || '3');
 
     useEffect(() => {
       localStorage.setItem('selectedItem', selectedItem);
@@ -187,7 +187,6 @@ export default function GmailTreeView() {
   return (
     <SimpleTreeView
       aria-label="gmail"
-      defaultExpandedItems={["1"]}
       defaultSelectedItems={selectedItem}
       slots={{
         expandIcon: CustomArrowDropDownIcon,
