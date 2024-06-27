@@ -11,13 +11,12 @@ import TableRow from '@mui/material/TableRow';
 import { FaSortAmountDown } from 'react-icons/fa';
 import { LuEye } from "react-icons/lu";
 import PaymentStatus from '../TableHeader/PaymentStatus';
-import AppointmentStatus from '../TableHeader/AppointmentStatus';
+import DeliveryStatus from '../TableHeader/DeliveryStatus';
 
 const url = 'https://retoolapi.dev/ONeFE7/data';
 
 const columns = [
   { id: 'id', label: 'Id', minWidth: 70 },
-  { id: 'name', label: 'Name / Phone / Email', minWidth: 100 },
   {
     id: 'date',
     label: 'Date',
@@ -25,72 +24,87 @@ const columns = [
     align: 'left',
     format: (value) => new Date(value).toLocaleString('en-US'),
   },
+  { id: 'name', label: 'Name / Phone / Email\nDelivery Address', minWidth: 100 },
   {
-    id: 'timeSlots',
-    label: 'Time Slots',
-    minWidth: 70,
-    align: 'left',
-    format: (value) => value.toFixed(2),
-  },
-  {
-    id: 'serviceType',
-    label: 'Service Type',
+    id: 'number',
+    label: (
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        Qty <FaSortAmountDown style={{ marginLeft: 4 }} />
+      </div>
+    ),
     minWidth: 70,
     align: 'center',
     format: (value) => value.toLocaleString('en-US'),
   },
   {
-    id: 'fees',
-    label: 'Fees',
+    id: 'total',
+    label: (
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        Total <FaSortAmountDown style={{ marginLeft: 4 }} />
+      </div>
+    ),
+    minWidth: 70,
+    align: 'left',
+    format: (value) => value.toFixed(2),
+  },
+  {
+    id: 'discountApplied',
+    label: 'Discount Applied',
     minWidth: 70,
     align: 'left',
     format: (value) => value.toFixed(2),
   },
   {
     id: 'paymentStatus',
-    label: 'Payment',
+    label: 'Payment Status',
     minWidth: 70,
     align: 'left',
     format: (value) => value,
   },
   {
-    id: 'appointmentStatus',
-    label: 'Appointment Status',
+    id: 'deliveryStatus',
+    label: 'Delivery Status',
+    minWidth: 70,
+    align: 'left',
+    format: (value) => value,
+  },
+  {
+    id: 'orderDetails',
+    label: 'Order Details',
     minWidth: 70,
     align: 'left',
     format: (value) => value,
   },
 ];
 
-function AppointentBody({ searchQuery, rowsPerPage,setRowsPerPage }) {
+function CouponTable() {
   const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = React.useState([]);
+
+  function getRandomMultipleOf50(min, max) {
+    const minMultiple = Math.ceil(min / 50);
+    const maxMultiple = Math.floor(max / 50);
+    const randomMultiple = Math.floor(Math.random() * (maxMultiple - minMultiple + 1)) + minMultiple;
+    return randomMultiple * 50;
+  }
 
   React.useEffect(() => {
     axios.get(url).then((response) => {
       const fetchedData = response.data.map((item) => {
-        let dateString = item.date;
-        const separateDateTime = (dateString) => {
-          const dateObj = new Date(dateString);
-          const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
-          const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
+        const discountApplied = getRandomMultipleOf50(100, 1000);
+        const total = (item.number * 200) - discountApplied;
 
-          const datePart = dateObj.toLocaleDateString(undefined, optionsDate);
-          const timePart = dateObj.toLocaleTimeString(undefined, optionsTime);
-
-          return { datePart, timePart };
-        };
-        const { datePart, timePart } = separateDateTime(dateString);
         return {
           id: item.id,
-          date: datePart,
-          timeSlots: timePart,
-          name: `${item.name}\n${item.phone}\n${item.email}`,
+          date: item.date,
+          name: `${item.name}\n${item.phone}\n${item.email}\n${item.address}`,
           number: item.number,
-          fees: item.number * 200,
-          serviceType: 'Hair Transplant',
+          discountApplied: discountApplied,
+          total: total,
           paymentStatus: (<PaymentStatus />),
-          appointmentStatus: (<AppointmentStatus />),
+          deliveryStatus: (<DeliveryStatus />),
+          orderDetails: (<div className='more-order-details' onClick={() => showOrder(item)}><LuEye /></div>),
         };
       });
       setRows(fetchedData);
@@ -102,17 +116,14 @@ function AppointentBody({ searchQuery, rowsPerPage,setRowsPerPage }) {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    const value = +event.target.value;
-    setRowsPerPage(value); // Update rowsPerPage in parent component
-    setPage(0); // Reset page to first page
+    setRowsPerPage(+event.target.value);
+    setPage(0);
   };
 
-  // Filter rows based on search query
-  const filteredRows = rows.filter((row) =>
-    row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.serviceType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.timeSlots.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const showOrder = (item) => {
+    // Function to show order details (implementation required)
+    console.log("Order details for:", item);
+  };
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -132,7 +143,7 @@ function AppointentBody({ searchQuery, rowsPerPage,setRowsPerPage }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredRows
+            {rows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
@@ -156,9 +167,9 @@ function AppointentBody({ searchQuery, rowsPerPage,setRowsPerPage }) {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10, 25, 50]}
+        rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={filteredRows.length}
+        count={rows.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -168,4 +179,4 @@ function AppointentBody({ searchQuery, rowsPerPage,setRowsPerPage }) {
   );
 }
 
-export default AppointentBody;
+export default CouponTable;

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DataGrid } from '@mui/x-data-grid';
-import ControlledSwitches from './Switch'; // Make sure to import the correct path for ControlledSwitches
+import ControlledSwitches from './Switch';
+import { TablePagination } from '@mui/material';
 
 const url = 'https://retoolapi.dev/ONeFE7/data';
 const url2 = 'https://retoolapi.dev/vor7Zw/data';
 
-const EditAppointment = () => {
+const EditAppointment = ({ searchQuery, rowsPerPage, setRowsPerPage }) => {
+  const [page, setPage] = useState(0);
   const [rows, setRows] = useState([]);
 
   const splitDateTime = (dateTime) => {
@@ -20,30 +22,22 @@ const EditAppointment = () => {
     const fetchData = async () => {
       try {
         const [response1, response2] = await Promise.all([axios.get(url), axios.get(url2)]);
-        console.log('Response 1 data:', response1.data);
-        console.log('Response 2 data:', response2.data);
-
-        // Create a map from response2 data using the id as the key
         const response2Map = new Map(response2.data.map(item => [item.id, item]));
-
-        // Merge the data from response1 and response2
         const combinedData = response1.data.map((item, index) => {
           let serviceFees = item.number * 200;
           const { date, time } = splitDateTime(item.date);
           const response2Item = response2Map.get(item.id) || {};
           return {
             id: item.id,
-            sn: index + 1, // Use index + 1 for a sequential S.N
-            serviceType: 'Hair Transplant',
-            timeSlots: `${date}n${time}` || 'N/A', // Provide a default value
+            sn: index + 1,
+            serviceType: 'Custom Orders',
+            timeSlots: `${date}\n${time}` || 'N/A',
             name: `${item.name || 'N/A'}\n${item.phone || 'N/A'}\n${item.email || 'N/A'}`,
-            number: item.number !== undefined ? item.number : 'N/A', // Provide a default value
-            fees: `Rs.${serviceFees !== undefined ? serviceFees : 'N/A'}`, // Provide a default value
-            active: response2Item.boolean !== undefined ? response2Item.boolean : true, // Default to active
+            number: item.number !== undefined ? item.number : 'N/A',
+            fees: `Rs.${serviceFees !== undefined ? serviceFees : 'N/A'}`,
+            active: response2Item.boolean !== undefined ? response2Item.boolean : true,
           };
         });
-
-        console.log('Combined data:', combinedData);
         setRows(combinedData);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -71,7 +65,6 @@ const EditAppointment = () => {
   };
 
   const handleEdit = (id) => {
-    // Implement your edit logic here
     console.log('Edit row with id:', id);
   };
 
@@ -94,7 +87,7 @@ const EditAppointment = () => {
       sortable: false,
       flex: 1,
       renderCell: (params) => (
-        <button onClick={() => handleEdit(params.row.id)}>Edit</button>
+        <button onClick={() => handleEdit(params.row.id)} style={{ padding: '5px 10px' }}>Edit</button>
       ),
     },
     {
@@ -104,12 +97,28 @@ const EditAppointment = () => {
       flex: 1,
       renderCell: (params) => (
         <ControlledSwitches
-          checked={params.row.active} // Pass row-specific active state
+          checked={params.row.active}
           onChange={() => handleSwitchToggle(params.row.id)}
         />
       ),
     },
   ];
+
+  const filteredRows = rows.filter(row => {
+    return Object.values(row).some(value =>
+      String(value).toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    const value = +event.target.value;
+    setRowsPerPage(value); // Update rowsPerPage in parent component
+    setPage(0); // Reset page to first page
+  };
 
   return (
     <div style={{ height: '100%', width: '100%', overflow: 'auto' }}>
@@ -117,24 +126,28 @@ const EditAppointment = () => {
         {`
           .disabled-row {
             opacity: 0.5;
-            background-color: #f5f5f5; /* Optional: Make it more noticeable */
+            background-color: #f5f5f5;
           }
         `}
       </style>
       <DataGrid
-        rows={rows}
+        rows={filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
         columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
-          },
-        }}
-        pageSizeOptions={[5, 10]}
         checkboxSelection
+        pageSize={rowsPerPage}
         disableSelectionOnClick
         onCellClick={handleCellClick}
         getRowClassName={getRowClassName}
-        style={{ height: '100%' }}
+        style={{ height: '89%' }}
+      />
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 50]}
+        component="div"
+        count={filteredRows.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </div>
   );

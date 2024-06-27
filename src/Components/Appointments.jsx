@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../TableHeader/Table.css';
 import AppointmentHeader from '../TableHeader/AppointmentHeader';
@@ -8,6 +8,9 @@ import ManageAppointments from './Appointments/ManageAppointments';
 function Appointments() {
   const location = useLocation();
   const isManageAppointments = location.pathname === '/appointments/manageappointments';
+
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [rowsPerPage, setRowsPerPage] = useState(10); // State for rows per page
 
   return (
     <div>
@@ -25,17 +28,17 @@ function Appointments() {
             </div>
           </div>
           <div className="table">
-            <AppointmentHeader />
+            <AppointmentHeader setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/> {/* Pass setSearchQuery */}
             <div className="table-body">
-              <AppointmentBody />
+              <AppointmentBody searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} /> {/* Pass rowsPerPage and setRowsPerPage */}
             </div>
           </div>
         </>
       ) : (
-        <ManageAppointments />
+        <ManageAppointments setSearchQuery={setSearchQuery} searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>
       )}
     </div>
-  );
+  )
 }
 
 export default Appointments;

@@ -1,5 +1,6 @@
 import React from 'react'
 import CouponHeader from '../TableHeader/CouponHeader'
+import CouponTable from '../TableBody/CouponTable'
 
 function Coupons() {
   return (
@@ -16,7 +17,9 @@ function Coupons() {
       </div>
       <div className="table">
       <CouponHeader/>
-      
+      <div className="table-body">
+      <CouponTable />
+      </div>
 
       </div>
     </div>

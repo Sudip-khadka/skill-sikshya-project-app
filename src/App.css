@@ -31,3 +31,6 @@ a{
 h1{
     margin:0px !important;
 }
+.MuiDataGrid-footerContainer.MuiDataGrid-withBorderColor.css-wop1k0-MuiDataGrid-footerContainer{
+    display:none;
+}
