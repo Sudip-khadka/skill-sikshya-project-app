@@ -1,17 +1,17 @@
-import React from 'react';
-import BasicSelect from './RowsPicker';
+import React, { useContext } from 'react';
 import './Table.css';
 import SearchAppBar from './SearchBar';
 import DateRange from './DatePicker';
 import AppointmentStatus from './AppointmentStatus';
 import AppointmentServiceStatus from './AppointmentServiceType';
+import { SearchContext } from '../Components/Context/StateManagement';
+import RowsPicker from './RowsPicker';
 
-function AppointmentHeader({ setSearchQuery ,rowsPerPage,setRowsPerPage,dateRange,setDateRange}) {
-  
+function AppointmentHeader({rowsPerPage,setRowsPerPage,setSearchQuery,setDateRange}) {
   return (
     <div className='table-headers'>
       <div className="show-rows-per-page">
-        <BasicSelect rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>
+        <RowsPicker rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>
       </div>
       <div className="search-containers">
         <div className="table-header-search">

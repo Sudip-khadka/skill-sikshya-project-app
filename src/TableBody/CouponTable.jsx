@@ -1,182 +1,214 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Table } from 'antd';
 import axios from 'axios';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import { FaSortAmountDown } from 'react-icons/fa';
-import { LuEye } from "react-icons/lu";
-import PaymentStatus from '../TableHeader/PaymentStatus';
-import DeliveryStatus from '../TableHeader/DeliveryStatus';
-
-const url = 'https://retoolapi.dev/ONeFE7/data';
+import ControlledSwitches from '../Components/Appointments/Switch';
 
 const columns = [
-  { id: 'id', label: 'Id', minWidth: 70 },
   {
-    id: 'date',
-    label: 'Date',
-    minWidth: 70,
-    align: 'left',
-    format: (value) => new Date(value).toLocaleString('en-US'),
+    title: 'S.N',
+    dataIndex: 'id',
   },
-  { id: 'name', label: 'Name / Phone / Email\nDelivery Address', minWidth: 100 },
   {
-    id: 'number',
-    label: (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        Qty <FaSortAmountDown style={{ marginLeft: 4 }} />
-      </div>
+    title: 'Coupon Code',
+    dataIndex: 'couponCode',
+  },
+  {
+    title: 'Starts Date',
+    dataIndex: 'startsDate',
+  },
+  {
+    title: 'End Date',
+    dataIndex: 'endsDate',
+  },
+  {
+    title: 'Coupon Type',
+    dataIndex: 'couponType',
+  },
+  {
+    title: 'Discount',
+    dataIndex: 'discount',
+  },
+  {
+    title: 'Limit',
+    dataIndex: 'limit',
+  },
+  {
+    title: 'Edit Entry',
+    dataIndex: 'editEntry',
+    render: (text, record) => (
+      <button onClick={() => handleEdit(record.id)} style={{ padding: '5px 15px', color: "#86888A", background: "none", border: "1px solid #86888A", borderRadius: "5px" }}>
+        Edit
+      </button>
     ),
-    minWidth: 70,
+    align: 'center'
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
     align: 'center',
-    format: (value) => value.toLocaleString('en-US'),
+    render: (text) => {
+      let backgroundColor, color, borderRadius, padding;
+
+      if (text === 'Active') {
+        backgroundColor = '#C3FEE8';
+        color = 'green';
+      } else if (text === 'Expired') {
+        backgroundColor = '#FFE6E8';
+        color = 'red';
+      }
+
+      borderRadius = '15px';
+      padding = '5px 0px';
+
+      return (
+        <div style={{ backgroundColor, color, borderRadius, padding }}>
+          {text}
+        </div>
+      );
+    },
   },
   {
-    id: 'total',
-    label: (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        Total <FaSortAmountDown style={{ marginLeft: 4 }} />
-      </div>
+    title: 'Action',
+    render: (text, record) => (
+      <ControlledSwitches
+        checked={record.active}
+        onChange={() => handleSwitchToggle(record.id)}
+      />
     ),
-    minWidth: 70,
-    align: 'left',
-    format: (value) => value.toFixed(2),
-  },
-  {
-    id: 'discountApplied',
-    label: 'Discount Applied',
-    minWidth: 70,
-    align: 'left',
-    format: (value) => value.toFixed(2),
-  },
-  {
-    id: 'paymentStatus',
-    label: 'Payment Status',
-    minWidth: 70,
-    align: 'left',
-    format: (value) => value,
-  },
-  {
-    id: 'deliveryStatus',
-    label: 'Delivery Status',
-    minWidth: 70,
-    align: 'left',
-    format: (value) => value,
-  },
-  {
-    id: 'orderDetails',
-    label: 'Order Details',
-    minWidth: 70,
-    align: 'left',
-    format: (value) => value,
   },
 ];
 
-function CouponTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [rows, setRows] = React.useState([]);
+const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOpen, dateRange = [] }) => {
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  function getRandomMultipleOf50(min, max) {
-    const minMultiple = Math.ceil(min / 50);
-    const maxMultiple = Math.floor(max / 50);
-    const randomMultiple = Math.floor(Math.random() * (maxMultiple - minMultiple + 1)) + minMultiple;
-    return randomMultiple * 50;
-  }
+  useEffect(() => {
+    const fetchCouponData = async () => {
+      try {
+        const response = await axios.get('https://retoolapi.dev/QRshdd/data');
+        console.log('Fetched Data:', response.data); // Debug log for fetched data
+        const fetchedData = response.data.map((item, index) => {
+          const couponType = item.Boolean ? "Percentage" : "Flat";
+          const discount = couponType === "Flat" ? `Rs ${1500}` : `${15}%`;
 
-  React.useEffect(() => {
-    axios.get(url).then((response) => {
-      const fetchedData = response.data.map((item) => {
-        const discountApplied = getRandomMultipleOf50(100, 1000);
-        const total = (item.number * 200) - discountApplied;
+          // Parse starting date including time
+          const startsDate = new Date(item.startingdate);
 
-        return {
-          id: item.id,
-          date: item.date,
-          name: `${item.name}\n${item.phone}\n${item.email}\n${item.address}`,
-          number: item.number,
-          discountApplied: discountApplied,
-          total: total,
-          paymentStatus: (<PaymentStatus />),
-          deliveryStatus: (<DeliveryStatus />),
-          orderDetails: (<div className='more-order-details' onClick={() => showOrder(item)}><LuEye /></div>),
-        };
-      });
-      setRows(fetchedData);
-    });
+          // Calculate end date 30 days from starting date
+          const endsDate = new Date(startsDate);
+          endsDate.setDate(startsDate.getDate() + 30);
+
+          // Format dates for display
+          const formattedStartDate = startsDate.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          const formattedEndDate = endsDate.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+          return {
+            key: index,
+            id: index + 1,
+            couponCode: `CNX${item.couponcode}` || `Coupon Code ${index}`,
+            startsDate: formattedStartDate,
+            endsDate: formattedEndDate,
+            couponType: couponType,
+            discount: discount,
+            limit: 25,
+            active: true, // Assuming item.active is a boolean value indicating status
+            status: item.Boolean ? "Active" : "Expired",
+          };
+        });
+        setData(fetchedData);
+        setFilteredData(fetchedData); // Initialize filteredData with fetched data
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchCouponData();
   }, []);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  // Update filtered data when search query or date range changes
+  useEffect(() => {
+    const filterData = () => {
+      let result = data;
+      console.log('Initial Data for filtering:', result); // Debug log for initial data
+
+      if (searchQuery.trim() !== '') {
+        result = result.filter((item) =>
+          item.couponCode.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        console.log('Data after search query filtering:', result); // Debug log after search query filtering
+      }
+
+      if (dateRange && dateRange.length === 2) {
+        const [rangeStartDate, rangeEndDate] = dateRange.map(date => new Date(date));
+        result = result.filter((item) => {
+          const itemEndsDate = new Date(item.endsDate);
+          console.log('Comparing itemEndsDate:', itemEndsDate, 'with rangeStartDate:', rangeStartDate, 'and rangeEndDate:', rangeEndDate); // Debug log for date comparison
+          return itemEndsDate >= rangeStartDate && itemEndsDate <= rangeEndDate;
+        });
+        console.log('Data after date range filtering:', result); // Debug log after date range filtering
+      }
+
+      setFilteredData(result);
+      console.log('Final Filtered Data:', result); // Debug log for final filtered data
+    };
+
+    filterData();
+  }, [searchQuery, dateRange]);
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+    setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
+  const handleSwitchToggle = (id) => {
+    // Implement your toggle switch logic here
+    console.log(`Toggling switch for ID ${id}`);
   };
 
-  const showOrder = (item) => {
-    // Function to show order details (implementation required)
-    console.log("Order details for:", item);
+  const handleEdit = (id) => {
+    // Implement your edit logic here
+    console.log(`Editing entry with ID ${id}`);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+    selections: [
+      Table.SELECTION_ALL,
+      Table.SELECTION_INVERT,
+      Table.SELECTION_NONE,
+      {
+        key: 'odd',
+        text: 'Select Odd Row',
+        onSelect: (changeableRowKeys) => {
+          let newSelectedRowKeys = changeableRowKeys.filter((_, index) => index % 2 !== 0);
+          setSelectedRowKeys(newSelectedRowKeys);
+        },
+      },
+      {
+        key: 'even',
+        text: 'Select Even Row',
+        onSelect: (changeableRowKeys) => {
+          let newSelectedRowKeys = changeableRowKeys.filter((_, index) => index % 2 === 0);
+          setSelectedRowKeys(newSelectedRowKeys);
+        },
+      },
+    ],
   };
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                  {columns.map((column) => {
-                    const value = row[column.id];
-                    return (
-                      <TableCell
-                        key={column.id}
-                        align={column.align}
-                        style={column.id === 'name' ? { whiteSpace: 'pre-line' } : {}}
-                      >
-                        {column.format && typeof value === 'number'
-                          ? column.format(value)
-                          : value}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+    <div style={{ height: '100%', overflow: 'auto' }}>
+      <Table
+        rowSelection={rowSelection}
+        columns={columns}
+        dataSource={filteredData}
+        pagination={{ pageSize: rowsPerPage }}
+        scroll={{ y: 350 }}
+        style={{ height: '70vh' }}
       />
-    </Paper>
+    </div>
   );
-}
+};
 
-export default CouponTable;
+export default App;

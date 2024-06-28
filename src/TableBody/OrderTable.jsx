@@ -77,9 +77,8 @@ const columns = [
   },
 ];
 
-function StickyHeadTable() {
+function OrderTable({ searchQuery, rowsPerPage, setRowsPerPage, dateRange }) {
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = React.useState([]);
 
   function getRandomMultipleOf50(min, max) {
@@ -94,10 +93,21 @@ function StickyHeadTable() {
       const fetchedData = response.data.map((item) => {
         const discountApplied = getRandomMultipleOf50(100, 1000);
         const total = (item.number * 200) - discountApplied;
+        let dateString = item.date;
+        const separateDateTime = (dateString) => {
+          const dateObj = new Date(dateString);
+          const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+          const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
 
+          const datePart = dateObj.toLocaleDateString(undefined, optionsDate);
+          const timePart = dateObj.toLocaleTimeString(undefined, optionsTime);
+
+          return { datePart, timePart };
+        };
+        const { datePart, timePart } = separateDateTime(dateString);
         return {
           id: item.id,
-          date: item.date,
+          date: datePart,
           name: `${item.name}\n${item.phone}\n${item.email}\n${item.address}`,
           number: item.number,
           discountApplied: discountApplied,
@@ -125,6 +135,21 @@ function StickyHeadTable() {
     console.log("Order details for:", item);
   };
 
+  // Filter rows based on search query and date range
+  const filteredRows = rows.filter((row) => {
+    const rowDate = new Date(row.date).getTime();
+    const [startDate, endDate] = dateRange;
+
+    const isWithinRange = startDate && endDate
+      ? rowDate >= startDate.startOf('day').valueOf() && rowDate <= endDate.endOf('day').valueOf()
+      : true;
+
+    return isWithinRange && (
+      row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.date.toLowerCase().includes(searchQuery.toLowerCase()) // Adjust this line as needed for other searchable fields
+    );
+  });
+
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -143,7 +168,7 @@ function StickyHeadTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
+            {filteredRows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
@@ -169,7 +194,7 @@ function StickyHeadTable() {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={rows.length}
+        count={filteredRows.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -179,4 +204,4 @@ function StickyHeadTable() {
   );
 }
 
-export default StickyHeadTable;
+export default OrderTable;

@@ -15,9 +15,11 @@ import PreOrder from './Components/PreOrder';
 import Delivery from './Components/Delivery';
 import Rating from './Components/Rating';
 import ManageAppointments from './Components/Appointments/ManageAppointments';
+import { SearchProvider } from './Components/Context/StateManagement';
 
 function App() {
   return (
+      <SearchProvider>
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<div>Welcome to Cnex Admin DashBoard</div>} />
@@ -37,6 +39,7 @@ function App() {
         {/* Add more routes here */}
       </Route>
     </Routes>
+      </SearchProvider>
   );
 }
 

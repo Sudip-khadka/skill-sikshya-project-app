@@ -90,7 +90,7 @@ const EditAppointment = ({ searchQuery, rowsPerPage, setRowsPerPage, setIsDialog
       sortable: false,
       flex: 1,
       renderCell: (params) => (
-        <button onClick={() => handleEdit(params.row.id)} style={{ padding: '5px 10px' }}>Edit</button>
+        <button onClick={() => handleEdit(params.row.id)} style={{padding: '5px 15px' ,color:"#86888A", background:"none", border:"1px solid #86888A", borderRadius:"5px"}}>Edit</button>
       ),
     },
     {

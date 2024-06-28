@@ -6,18 +6,18 @@ import DateRange from './DatePicker'
 import CouponStatus from './CouponStatus'
 import CouponType from './CouponType'
 
-function CouponHeader() {
+function CouponHeader({rowsPerPage,setRowsPerPage,setSearchQuery,setDateRange}) {
   return (
     <div className='table-headers'>
         <div className="show-rows-per-page">
-      <BasicSelect/>
+        <BasicSelect rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>
         </div>
        <div className="search-containers">
        <div className="table-header-search">
-            <SearchAppBar/>
+       <SearchAppBar setSearchQuery={setSearchQuery} />
         </div>
         <div className="date-picker">
-          <DateRange/>
+        <DateRange setDateRange={setDateRange} />
           
         </div>
         <div className="delivery-status">

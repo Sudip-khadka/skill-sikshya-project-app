@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useContext, useState } from 'react'
 import CouponHeader from '../TableHeader/CouponHeader'
 import CouponTable from '../TableBody/CouponTable'
+import { SearchContext } from './Context/StateManagement'
 
 function Coupons() {
+  const {searchQuery, setSearchQuery ,rowsPerPage,dateRange,setDateRange,setRowsPerPage} = useContext(SearchContext)
+
   return (
     <div>
       <div className="product-categories-header">
@@ -16,9 +19,9 @@ function Coupons() {
       {/* Pass the state and handlers to the FormDialog component */}
       </div>
       <div className="table">
-      <CouponHeader/>
+    <CouponHeader setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} setDateRange={setDateRange} />
       <div className="table-body">
-      <CouponTable />
+      <CouponTable searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} />
       </div>
 
       </div>

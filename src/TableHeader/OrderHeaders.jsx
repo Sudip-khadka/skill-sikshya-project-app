@@ -6,18 +6,18 @@ import DateRange from './DatePicker'
 import PaymentStatus from './PaymentStatus'
 import DeliveryStatus from './DeliveryStatus'
 
-function OrderHeaders() {
+function OrderHeaders({rowsPerPage,setRowsPerPage,setSearchQuery,setDateRange}) {
   return (
     <div className='table-headers'>
         <div className="show-rows-per-page">
-      <RowsPicker/>
+        <RowsPicker rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>
         </div>
        <div className="search-containers">
        <div className="table-header-search">
-            <SearchAppBar/>
+       <SearchAppBar setSearchQuery={setSearchQuery} />
         </div>
         <div className="date-picker">
-          <DateRange/>
+        <DateRange setDateRange={setDateRange} />
           
         </div>
         <div className="delivery-status">

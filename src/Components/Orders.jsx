@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import '../TableHeader/Table.css'
 import OrderHeaders from '../TableHeader/OrderHeaders'
-import OrderTableBody from '../TableBody/OrderTableBody'
+import { SearchContext } from './Context/StateManagement';
+import OrderTable from '../TableBody/OrderTable';
 
 function Orders() {
+  const { searchQuery, setSearchQuery, rowsPerPage, setRowsPerPage, dateRange, setDateRange } = useContext(SearchContext);
   return (
     <div>
       <div className="product-categories-header">
@@ -16,8 +18,8 @@ function Orders() {
       </div>
       <div className="table">
 
-      <OrderHeaders/>
-        <OrderTableBody/>
+      <OrderHeaders setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} setDateRange={setDateRange}/>
+        <OrderTable searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange}/>
       </div>
     </div>
   )

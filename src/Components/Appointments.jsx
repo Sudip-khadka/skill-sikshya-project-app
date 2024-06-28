@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../TableHeader/Table.css';
 import AppointmentHeader from '../TableHeader/AppointmentHeader';
 import AppointmentBody from '../TableBody/ApointmentTable';
 import ManageAppointments from './Appointments/ManageAppointments';
+import { SearchContext } from './Context/StateManagement';
 
 function Appointments() {
   const location = useLocation();
   const isManageAppointments = location.pathname === '/appointments/manageappointments';
 
-  const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  const [rowsPerPage, setRowsPerPage] = useState(10); // State for rows per page
-  const [dateRange, setDateRange] = useState([null, null]);
+  const { searchQuery, setSearchQuery, rowsPerPage, setRowsPerPage, dateRange, setDateRange } = useContext(SearchContext);
 
   return (
     <div>
