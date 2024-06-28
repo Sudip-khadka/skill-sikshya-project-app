@@ -62,7 +62,7 @@ const columns = [
   },
 ];
 
-function AppointentBody({ searchQuery, rowsPerPage,setRowsPerPage }) {
+function AppointentBody({ searchQuery, rowsPerPage,setRowsPerPage,dateRange }) {
   const [page, setPage] = React.useState(0);
   const [rows, setRows] = React.useState([]);
 
@@ -109,9 +109,19 @@ function AppointentBody({ searchQuery, rowsPerPage,setRowsPerPage }) {
 
   // Filter rows based on search query
   const filteredRows = rows.filter((row) =>
-    row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.serviceType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.timeSlots.toLowerCase().includes(searchQuery.toLowerCase())
+   {
+    const rowDate = new Date(row.date).getTime();
+    const [startDate, endDate] = dateRange;
+
+    const isWithinRange = startDate && endDate
+      ? rowDate >= startDate.startOf('day').valueOf() && rowDate <= endDate.endOf('day').valueOf()
+      : true;
+
+    return isWithinRange && (
+      row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.serviceType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.timeSlots.toLowerCase().includes(searchQuery.toLowerCase())
+    );}
   );
 
   return (

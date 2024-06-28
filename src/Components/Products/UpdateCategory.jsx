@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import axios from 'axios';
 
-export default function FormDialog({ open, handleClose }) {
+export default function UpdateCategory({ open, handleClose }) {
   const apiToPost = "https://retoolapi.dev/yd0z2S/data";
 
   const handleSubmit = async (event) => {

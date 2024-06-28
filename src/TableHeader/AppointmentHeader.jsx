@@ -6,7 +6,8 @@ import DateRange from './DatePicker';
 import AppointmentStatus from './AppointmentStatus';
 import AppointmentServiceStatus from './AppointmentServiceType';
 
-function AppointmentHeader({ setSearchQuery ,rowsPerPage,setRowsPerPage}) {
+function AppointmentHeader({ setSearchQuery ,rowsPerPage,setRowsPerPage,dateRange,setDateRange}) {
+  
   return (
     <div className='table-headers'>
       <div className="show-rows-per-page">
@@ -17,7 +18,7 @@ function AppointmentHeader({ setSearchQuery ,rowsPerPage,setRowsPerPage}) {
           <SearchAppBar setSearchQuery={setSearchQuery} /> {/* Pass setSearchQuery */}
         </div>
         <div className="date-picker">
-          <DateRange />
+          <DateRange setDateRange={setDateRange} />
         </div>
         <div className="delivery-status">
           <AppointmentServiceStatus />

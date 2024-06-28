@@ -7,7 +7,7 @@ import { TablePagination } from '@mui/material';
 const url = 'https://retoolapi.dev/ONeFE7/data';
 const url2 = 'https://retoolapi.dev/vor7Zw/data';
 
-const EditAppointment = ({ searchQuery, rowsPerPage, setRowsPerPage }) => {
+const EditAppointment = ({ searchQuery, rowsPerPage, setRowsPerPage, setIsDialogOpen, dateRange }) => {
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState([]);
 
@@ -31,11 +31,12 @@ const EditAppointment = ({ searchQuery, rowsPerPage, setRowsPerPage }) => {
             id: item.id,
             sn: index + 1,
             serviceType: 'Custom Orders',
-            timeSlots: `${date}\n${time}` || 'N/A',
+            timeSlots: `${date}` || 'N/A',
             name: `${item.name || 'N/A'}\n${item.phone || 'N/A'}\n${item.email || 'N/A'}`,
             number: item.number !== undefined ? item.number : 'N/A',
             fees: `Rs.${serviceFees !== undefined ? serviceFees : 'N/A'}`,
             active: response2Item.boolean !== undefined ? response2Item.boolean : true,
+            date: item.date,
           };
         });
         setRows(combinedData);
@@ -65,6 +66,8 @@ const EditAppointment = ({ searchQuery, rowsPerPage, setRowsPerPage }) => {
   };
 
   const handleEdit = (id) => {
+    const rowData = rows.find(row => row.id === id);
+    setIsDialogOpen('Edit Appointment', 'Save Changes', rowData);
     console.log('Edit row with id:', id);
   };
 
@@ -105,7 +108,14 @@ const EditAppointment = ({ searchQuery, rowsPerPage, setRowsPerPage }) => {
   ];
 
   const filteredRows = rows.filter(row => {
-    return Object.values(row).some(value =>
+    const rowDate = new Date(row.date).getTime();
+    const [startDate, endDate] = dateRange;
+
+    const isWithinRange = startDate && endDate
+      ? rowDate >= startDate.startOf('day').valueOf() && rowDate <= endDate.endOf('day').valueOf()
+      : true;
+
+    return isWithinRange && Object.values(row).some(value =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
     );
   });

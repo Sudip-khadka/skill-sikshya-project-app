@@ -4,9 +4,9 @@ import './Table.css';
 
 const { RangePicker } = DatePicker;
 
-const DateRange = () => (
+const DateRange = ({ setDateRange }) => (
     <Space direction="vertical" className="custom-date-picker">
-      <RangePicker />
+      <RangePicker onChange={(dates) => setDateRange(dates)} />
     </Space>
 );
 

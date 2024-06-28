@@ -14,3 +14,47 @@
     color:aliceblue;
     border-radius: 8px;
 }
+.product-categories {
+    padding: 20px;
+  }
+  
+  .product-categories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .product-categories-header-text {
+    flex-grow: 1;
+  }
+  
+  .product-categories-header-text h1 {
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  .product-categories-header-text p {
+    margin: 0;
+    color: gray;
+  }
+  
+  .product-categories-header-btn {
+    margin-left: 20px;
+  }
+  
+  .product-categories-header-btn .btn {
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .product-categories-header-btn .btn:hover {
+    background-color: #115293;
+  }
+  
+  .table {
+    margin-top: 20px;
+  }
+  

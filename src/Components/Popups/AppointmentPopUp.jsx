@@ -16,11 +16,11 @@ import { MultiInputTimeRangeField } from "@mui/x-date-pickers-pro/MultiInputTime
 import { v4 as uuidv4 } from 'uuid';  // Import the UUID package
 import { Alert } from 'antd';
 
-export default function AddAppointment({ open, handleClose }) {
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [timeSlots, setTimeSlots] = useState([{ id: uuidv4(), from: "", to: "" }]);
-  const [staff, setStaff] = useState('');
-  const [serviceFee, setServiceFee] = useState('');
+export default function AddAppointment({ open, handleClose,title,btnText,editedRow }) {
+  const [uploadedImage, setUploadedImage] = useState(editedRow?.uploadedImage || null);
+  const [timeSlots, setTimeSlots] = useState(editedRow?.timeSlots || [{ id: uuidv4(), from: "", to: "" }]);
+  const [staff, setStaff] = useState(editedRow?.staff || '');
+  const [serviceFee, setServiceFee] = useState(editedRow?.serviceFee || '');
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   const handleImageUpload = (event) => {
@@ -102,7 +102,8 @@ export default function AddAppointment({ open, handleClose }) {
         },
       }}
     >
-      <DialogTitle sx={{ textAlign: "center" }}>Setup Appointment</DialogTitle>
+      <DialogTitle sx={{ textAlign: "center" }}>{title}</DialogTitle>
+      <hr/>
       <DialogContent sx={{ width: "100%", display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <h2>Service Type</h2>
@@ -246,7 +247,7 @@ export default function AddAppointment({ open, handleClose }) {
             </Button>
           )}
         </Box>
-        {showSuccessAlert && <Box sx={{position:"absolute", top:'80%', width:'80%',left:'8.5%'}}><Alert message="Appointment Added Sucessfully" type="success" showIcon/></Box>}
+        {showSuccessAlert && <Box sx={{position:"absolute", top:'80%', width:'80%',left:'8.5%'}}><Alert message={`${title} Sucessfull`} type="success" showIcon/></Box>}
       </DialogContent>
       <DialogActions
         sx={{
@@ -270,7 +271,7 @@ export default function AddAppointment({ open, handleClose }) {
             },
           }}
         >
-          Add
+          {btnText}
         </Button>
       </DialogActions>
     </Dialog>

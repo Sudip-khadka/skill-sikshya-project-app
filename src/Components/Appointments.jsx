@@ -11,6 +11,7 @@ function Appointments() {
 
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [rowsPerPage, setRowsPerPage] = useState(10); // State for rows per page
+  const [dateRange, setDateRange] = useState([null, null]);
 
   return (
     <div>
@@ -28,14 +29,14 @@ function Appointments() {
             </div>
           </div>
           <div className="table">
-            <AppointmentHeader setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/> {/* Pass setSearchQuery */}
+          <AppointmentHeader setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} setDateRange={setDateRange}/> {/* Pass setSearchQuery */}
             <div className="table-body">
-              <AppointmentBody searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} /> {/* Pass rowsPerPage and setRowsPerPage */}
+              <AppointmentBody searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange}/> {/* Pass rowsPerPage and setRowsPerPage */}
             </div>
           </div>
         </>
       ) : (
-        <ManageAppointments setSearchQuery={setSearchQuery} searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>
+        <ManageAppointments setSearchQuery={setSearchQuery} searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} setDateRange={setDateRange}/>
       )}
     </div>
   )

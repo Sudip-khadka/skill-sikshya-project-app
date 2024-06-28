@@ -6,10 +6,16 @@ import { Link } from 'react-router-dom';
 import { IoMdArrowRoundBack } from "react-icons/io";
 import AddAppointment from '../Popups/AppointmentPopUp';
 
-function ManageAppointments({ searchQuery, setSearchQuery,rowsPerPage,setRowsPerPage }) {
+function ManageAppointments({ searchQuery, setSearchQuery, rowsPerPage, setRowsPerPage,dateRange,setDateRange }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState('Setup Appointment');
+  const [dialogButtonText, setDialogButtonText] = useState('Add');
+  const [editedRow, setEditedRow] = useState(null);
 
-  const openDialog = () => {
+  const openDialog = (title, buttonText, rowData = null) => {
+    setDialogTitle(title);
+    setDialogButtonText(buttonText);
+    setEditedRow(rowData);
     setIsDialogOpen(true);
   };
 
@@ -26,14 +32,26 @@ function ManageAppointments({ searchQuery, setSearchQuery,rowsPerPage,setRowsPer
         </div>
 
         <div className="product-categories-header-btn">
-          <button className='btn' onClick={openDialog}>+ Setup</button>
-          <AddAppointment open={isDialogOpen} handleClose={closeDialog} />
+          <button className='btn' onClick={() => openDialog('Setup Appointment', 'Add')}>+ Setup</button>
+          <AddAppointment
+            open={isDialogOpen}
+            handleClose={closeDialog}
+            title={dialogTitle}
+            btnText={dialogButtonText}
+            editedRow={editedRow}
+          />
         </div>
       </div>
       <div className="table">
-        <AppointmentHeader setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/> {/* Pass setSearchQuery */}
+        <AppointmentHeader setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} setDateRange={setDateRange}/>
         <div className="table-body">
-          <EditAppointment searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/> {/* Pass searchQuery */}
+          <EditAppointment
+            searchQuery={searchQuery}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            setIsDialogOpen={openDialog} // Pass openDialog with parameters
+            dateRange={dateRange}
+          />
         </div>
       </div>
     </div>
