@@ -78,7 +78,7 @@ const columns = [
   },
 ];
 
-const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOpen, dateRange = [] }) => {
+const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOpen, dateRange = [], coupon, setCoupon }) => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -126,35 +126,43 @@ const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOp
     fetchCouponData();
   }, []);
 
-  // Update filtered data when search query or date range changes
-  useEffect(() => {
-    const filterData = () => {
-      let result = data;
-      console.log('Initial Data for filtering:', result); // Debug log for initial data
+ // Update filtered data when search query, date range, or coupon changes
+ useEffect(() => {
+  const filterData = () => {
+    let result = data;
 
-      if (searchQuery.trim() !== '') {
-        result = result.filter((item) =>
-          item.couponCode.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        console.log('Data after search query filtering:', result); // Debug log after search query filtering
+    if (searchQuery.trim() !== '' || coupon !== '') {
+      result = result.filter((item) =>
+        item.couponCode.toLowerCase().includes(searchQuery.toLowerCase()));
+      console.log('Data after search query and coupon filtering:', result); // Debug log after search query and coupon filtering
+    }
+
+    // Filter based on coupon type selection
+    if(searchQuery.trim() !== '' || coupon !== '' ){
+      if (coupon === 'flatType') {
+        result = result.filter((item) => item.couponType.toLowerCase() === 'flat');
+      } else if (coupon === 'percentage') {
+        result = result.filter((item) => item.couponType.toLowerCase() === 'percentage');
       }
+    }
 
-      if (dateRange && dateRange.length === 2) {
-        const [rangeStartDate, rangeEndDate] = dateRange.map(date => new Date(date));
-        result = result.filter((item) => {
-          const itemEndsDate = new Date(item.endsDate);
-          console.log('Comparing itemEndsDate:', itemEndsDate, 'with rangeStartDate:', rangeStartDate, 'and rangeEndDate:', rangeEndDate); // Debug log for date comparison
-          return itemEndsDate >= rangeStartDate && itemEndsDate <= rangeEndDate;
-        });
-        console.log('Data after date range filtering:', result); // Debug log after date range filtering
-      }
+    // Apply date range filter only if a valid date range is provided
+    if (dateRange && dateRange.length === 2) {
+      const [rangeStartDate, rangeEndDate] = dateRange.map(date => new Date(date));
+      result = result.filter((item) => {
+        const itemEndsDate = new Date(item.endsDate);
+        return itemEndsDate >= rangeStartDate && itemEndsDate <= rangeEndDate;
+      });
+      console.log('Data after date range filtering:', result); // Debug log after date range filtering
+    }
 
-      setFilteredData(result);
-      console.log('Final Filtered Data:', result); // Debug log for final filtered data
-    };
+    setFilteredData(result);
+    console.log('Final Filtered Data:', result); // Debug log for final filtered data
+  };
 
-    filterData();
-  }, [searchQuery, dateRange]);
+  filterData();
+}, [searchQuery, dateRange, coupon]); // Add coupon to dependency array
+
 
   const onSelectChange = (newSelectedRowKeys) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys);

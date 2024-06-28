@@ -4,11 +4,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-export default function CouponType() {
-  const [couponType, setCouponType] = React.useState('');
+export default function CouponType({coupon,setCoupon}) {
 
   const handleChange = (event) => {
-    setCouponType(event.target.value);
+    setCoupon(event.target.value);
+    console.log(event.target.value);
   };
 
   return (
@@ -18,7 +18,7 @@ export default function CouponType() {
         <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
-          value={couponType}
+          value={coupon}
           onChange={handleChange}
           autoWidth
           label="Coupon Type"
@@ -27,7 +27,7 @@ export default function CouponType() {
             <em>None</em>
           </MenuItem>
           <MenuItem value={'flatType'}>Flat Discount</MenuItem>
-          <MenuItem value={'percentage'}>Precentage</MenuItem>
+          <MenuItem value={'percentage'}>Percentage</MenuItem>
         </Select>
       </FormControl>
     </div>
