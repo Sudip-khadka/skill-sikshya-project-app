@@ -34,3 +34,8 @@ h1{
 .MuiDataGrid-footerContainer.MuiDataGrid-withBorderColor.css-wop1k0-MuiDataGrid-footerContainer{
     display:none;
 }
+
+/*css for radio component*/
+.css-13sqqng-JoyListItem-root {
+    margin:none;
+    margin-block-start:none !important;}

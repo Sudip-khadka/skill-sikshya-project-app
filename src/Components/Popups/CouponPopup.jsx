@@ -1,27 +1,40 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { styled } from "@mui/material/styles";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import Input from "@mui/joy/Input";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { MultiInputTimeRangeField } from "@mui/x-date-pickers-pro/MultiInputTimeRangeField";
-import { v4 as uuidv4 } from 'uuid';  // Import the UUID package
 import { Alert } from 'antd';
+import TextArea from "antd/es/input/TextArea";
+import { v4 as uuidv4 } from 'uuid';
+import DatePickerValue from "../DatePicker";
+import RadioPositionEnd from "../RadioGroup";
 
-export default function CouponPopup({ open, handleClose,title,btnText,editedRow }) {
+export default function AddCoupon({ open, handleClose, title, btnText, editedRow }) {
   const [uploadedImage, setUploadedImage] = useState(editedRow?.uploadedImage || null);
   const [timeSlots, setTimeSlots] = useState(editedRow?.timeSlots || [{ id: uuidv4(), from: "", to: "" }]);
-  const [staff, setStaff] = useState(editedRow?.staff || '');
+  const [code, setCode] = useState(editedRow?.code || '');
   const [serviceFee, setServiceFee] = useState(editedRow?.serviceFee || '');
+  const [couponType, setCouponType] = useState(editedRow?.couponType || 'Flat Discount');
+  const [discount, setDiscount] = useState(editedRow?.discount || '');
+  const [description, setDescription] = useState(editedRow?.description || '');
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+  useEffect(() => {
+    if (editedRow) {
+      setCode(editedRow.code);
+      setServiceFee(editedRow.serviceFee);
+      setUploadedImage(editedRow.uploadedImage);
+      setTimeSlots(editedRow.timeSlots || [{ id: uuidv4(), from: "", to: "" }]);
+      setCouponType(editedRow.couponType);
+      setDiscount(editedRow.discount);
+      setDescription(editedRow.description);
+    }
+  }, [editedRow]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -51,16 +64,19 @@ export default function CouponPopup({ open, handleClose,title,btnText,editedRow 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!staff || !serviceFee || !uploadedImage) {
+    if (!code || !serviceFee || !uploadedImage || !discount) {
       alert("Please fill in all fields and upload a valid image file.");
       return;
     }
 
     const formData = {
-      staff,
+      code,
       serviceFee,
       uploadedImage,
-      timeSlots
+      timeSlots,
+      couponType,
+      discount,
+      description
     };
 
     console.log(formData);
@@ -70,7 +86,6 @@ export default function CouponPopup({ open, handleClose,title,btnText,editedRow 
       setShowSuccessAlert(false);
       handleClose();
     }, 3000);
-
   };
 
   const VisuallyHiddenInput = styled("input")({
@@ -105,149 +120,51 @@ export default function CouponPopup({ open, handleClose,title,btnText,editedRow 
       <DialogTitle sx={{ textAlign: "center" }}>{title}</DialogTitle>
       <hr/>
       <DialogContent sx={{ width: "100%", display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <h2>Service Type</h2>
-          <Input
-            sx={{ marginTop: "5px" }}
-            size="lg"
-            placeholder="Hair Cutting & Styling"
-            name="serviceType"
-          />
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            marginTop: "10px",
-          }}
-        >
-          <div
-            className="add-slots"
-            style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <h2>Add Slots</h2>
-            <h3 style={{ color: "#082D4A", cursor: 'pointer' }} onClick={handleAddMoreSlots}>
-              + Add More Slots
-            </h3>
-          </div>
-          <div className="time">
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer
-                components={[
-                  "MultiInputTimeRangeField",
-                  "SingleInputTimeRangeField",
-                ]}
-              >
-                {timeSlots.map((slot, index) => (
-                  <Box
-                    key={slot.id}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                    }}
-                  >
-                    <MultiInputTimeRangeField
-                      slotProps={{
-                        textField: ({ position }) => ({
-                          label:
-                            position === "start"
-                              ? `From Slot ${index + 1}`
-                              : `To Slot ${index + 1}`,
-                        }),
-                      }}
-                    />
-                    {timeSlots.length > 1 && (
-                      <Button
-                        onClick={() => handleDeleteSlot(slot.id)}
-                        sx={{ minWidth: "auto" }}
-                      >
-                        <DeleteIcon sx={{color:'red'}}/>
-                      </Button>
-                    )}
-                  </Box>
-                ))}
-              </DemoContainer>
-            </LocalizationProvider>
-          </div>
-        </Box>
         <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
           <div className="second-row-of-staff" style={{ flex: '1' }}>
-            <h2>No.of Available Staff</h2>
+            <h2>Coupon Code</h2>
             <Input
               sx={{ marginTop: "5px" }}
               size="lg"
-              placeholder="10"
-              name="staff"
-              value={staff}
-              onChange={(e) => setStaff(e.target.value)}
+              placeholder="CNX11002"
+              name="code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
             />
           </div>
           <div className="service-fee" style={{ flex: '1' }}>
-            <h2>Service Fee</h2>
+            <h2>Uses Limit</h2>
             <Input
               sx={{ marginTop: "5px" }}
               size="lg"
-              placeholder="NRs. 25000"
+              placeholder="25"
               name="serviceFee"
               value={serviceFee}
               onChange={(e) => setServiceFee(e.target.value)}
             />
           </div>
         </Box>
-        <Box>
-          {uploadedImage ? (
-            <Box sx={{ position: "relative", width: "100%", height: "200px" }}>
-              <img
-                src={uploadedImage}
-                alt="Uploaded"
-                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
-              />
-              <Button
-                onClick={handleRemoveImage}
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  minWidth: "auto",
-                  padding: "5px",
-                  background: "rgba(255, 255, 255, 0.8)",
-                  borderRadius: "50%",
-                }}
-              >
-                <DeleteIcon sx={{ color: "red" }} />
-              </Button>
-            </Box>
-          ) : (
-            <Button
-              sx={{
-                marginTop: "20px",
-                width: "100%",
-                color: "#082D4A",
-                border: "3px dotted #082D4A",
-                borderRadius: "8px",
-                height: "150px",
-                background: "#D6EBFB",
-                "&:hover": {
-                  color: "#D6EBFB",
-                  backgroundColor: "#082D4A",
-                },
-              }}
-              component="label"
-              variant="contained"
-            >
-              Upload Image
-              <VisuallyHiddenInput type="file" name="image" accept="image/*" onChange={handleImageUpload} />
-            </Button>
-          )}
+        <h3>Select Date</h3>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <DatePickerValue />
         </Box>
-        {showSuccessAlert && <Box sx={{position:"absolute", top:'80%', width:'80%',left:'8.5%'}}><Alert message={`${title} Sucessfull`} type="success" showIcon/></Box>}
+        <Box>
+          <h3>Coupon Type</h3>
+          <RadioPositionEnd value={couponType} onChange={(e) => setCouponType(e.target.value)} />
+        </Box>
+        <Box sx={{ width: '100%' }}>
+          <h3>Discount</h3>
+          <Input
+            sx={{ margin: "10px 0px" }}
+            size="lg"
+            placeholder="Discount amount or discount percentage"
+            name="discount"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
+          />
+          <TextArea rows={5} placeholder="Write description here...." value={description} onChange={(e) => setDescription(e.target.value)} />
+        </Box>
+        {showSuccessAlert && <Box sx={{ position: "absolute", top: '80%', width: '80%', left: '8.5%' }}><Alert message={`${title} Successful`} type="success" showIcon /></Box>}
       </DialogContent>
       <DialogActions
         sx={{
