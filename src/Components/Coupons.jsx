@@ -6,6 +6,7 @@ import { SearchContext } from './Context/StateManagement'
 function Coupons() {
   const {searchQuery, setSearchQuery ,rowsPerPage,dateRange,setDateRange,setRowsPerPage} = useContext(SearchContext);
   const [coupon,setCoupon] = useState("");
+  const [couponStatus,setCouponStatus] = useState("");
 
   return (
     <div>
@@ -20,9 +21,9 @@ function Coupons() {
       {/* Pass the state and handlers to the FormDialog component */}
       </div>
       <div className="table">
-    <CouponHeader setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} setDateRange={setDateRange} coupon={coupon} setCoupon={setCoupon} />
+    <CouponHeader setSearchQuery={setSearchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} setDateRange={setDateRange} coupon={coupon} setCoupon={setCoupon} setCouponStatus={setCouponStatus} couponStatus={couponStatus} />
       <div className="table-body">
-      <CouponTable searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} coupon={coupon} setCoupon={setCoupon}/>
+      <CouponTable searchQuery={searchQuery} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} dateRange={dateRange} coupon={coupon} setCoupon={setCoupon} setCouponStatus={setCouponStatus} couponStatus={couponStatus}/>
       </div>
 
       </div>

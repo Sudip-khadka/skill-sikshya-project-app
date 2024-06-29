@@ -78,7 +78,7 @@ const columns = [
   },
 ];
 
-const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOpen, dateRange = [], coupon, setCoupon }) => {
+const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOpen, dateRange = [], coupon, setCoupon,couponStatus, }) => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -91,7 +91,7 @@ const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOp
         const fetchedData = response.data.map((item, index) => {
           const couponType = item.Boolean ? "Percentage" : "Flat";
           const discount = couponType === "Flat" ? `Rs ${1500}` : `${15}%`;
-
+          const status =  item.Boolean ? "Active" : "Expired";
           // Parse starting date including time
           const startsDate = new Date(item.startingdate);
 
@@ -113,11 +113,10 @@ const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOp
             discount: discount,
             limit: 25,
             active: true, // Assuming item.active is a boolean value indicating status
-            status: item.Boolean ? "Active" : "Expired",
+            status:status,
           };
         });
         setData(fetchedData);
-        setFilteredData(fetchedData); // Initialize filteredData with fetched data
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -126,43 +125,53 @@ const App = ({ searchQuery = '', rowsPerPage = 10, setRowsPerPage, setIsDialogOp
     fetchCouponData();
   }, []);
 
- // Update filtered data when search query, date range, or coupon changes
- useEffect(() => {
-  const filterData = () => {
-    let result = data;
+  useEffect(() => {
+    const filterData = () => {
+      let result = data;
 
-    if (searchQuery.trim() !== '' || coupon !== '') {
-      result = result.filter((item) =>
-        item.couponCode.toLowerCase().includes(searchQuery.toLowerCase()));
-      console.log('Data after search query and coupon filtering:', result); // Debug log after search query and coupon filtering
-    }
-
-    // Filter based on coupon type selection
-    if(searchQuery.trim() !== '' || coupon !== '' ){
-      if (coupon === 'flatType') {
-        result = result.filter((item) => item.couponType.toLowerCase() === 'flat');
-      } else if (coupon === 'percentage') {
-        result = result.filter((item) => item.couponType.toLowerCase() === 'percentage');
+      // Filter by search query
+      if (searchQuery.trim() !== '') {
+        result = result.filter((item) =>
+          item.couponCode.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        console.log('Data after search query filtering:', result); // Debug log after search query filtering
       }
-    }
 
-    // Apply date range filter only if a valid date range is provided
-    if (dateRange && dateRange.length === 2) {
-      const [rangeStartDate, rangeEndDate] = dateRange.map(date => new Date(date));
-      result = result.filter((item) => {
-        const itemEndsDate = new Date(item.endsDate);
-        return itemEndsDate >= rangeStartDate && itemEndsDate <= rangeEndDate;
-      });
-      console.log('Data after date range filtering:', result); // Debug log after date range filtering
-    }
+      // Filter by coupon type
+      if (coupon) {
+        if (coupon === 'flatType') {
+          result = result.filter((item) => item.couponType.toLowerCase() === 'flat');
+        } else if (coupon === 'percentage') {
+          result = result.filter((item) => item.couponType.toLowerCase() === 'percentage');
+        }
+        console.log('Data after coupon type filtering:', result); // Debug log after coupon type filtering
+      }
+      if(couponStatus){
+        console.log('Data after coupon status filtering:', result);
+        if (couponStatus === 'active') {
+          result = result.filter((item) => item.status.toLowerCase() === 'active');
+        } else if (couponStatus === 'expired') {
+          result = result.filter((item) => item.status.toLowerCase() === 'expired');
+        }
+      }
 
-    setFilteredData(result);
-    console.log('Final Filtered Data:', result); // Debug log for final filtered data
-  };
+      // Apply date range filter only if a valid date range is provided
+      if (dateRange[0]!==null) {
+        const [rangeStartDate, rangeEndDate] = dateRange.map(date => new Date(date));
+        result = result.filter((item) => {
+          const itemEndsDate = new Date(item.endsDate);
+          return itemEndsDate >= rangeStartDate && itemEndsDate <= rangeEndDate;
+        });
+        console.log(dateRange,dateRange.length)
+        console.log('Data after date range filtering:', result); // Debug log after date range filtering
+      }
 
-  filterData();
-}, [searchQuery, dateRange, coupon]); // Add coupon to dependency array
+      setFilteredData(result);
+      console.log('Final Filtered Data:', result); // Debug log for final filtered data
+    };
 
+    filterData();
+  }, [searchQuery, dateRange, coupon,couponStatus, data]);
 
   const onSelectChange = (newSelectedRowKeys) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys);

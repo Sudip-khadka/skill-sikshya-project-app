@@ -4,11 +4,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-export default function CouponStatus() {
-  const [deliveryStatus, setDeliveryStatus] = React.useState('');
+export default function CouponStatus({couponStatus,setCouponStatus}) {
 
   const handleChange = (event) => {
-    setDeliveryStatus(event.target.value);
+    setCouponStatus(event.target.value);
+    console.log(event.target.value);
   };
 
   return (
@@ -18,10 +18,10 @@ export default function CouponStatus() {
         <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
-          value={deliveryStatus}
+          value={couponStatus}
           onChange={handleChange}
           autoWidth
-          label="Delivery Status"
+          label="Coupon Status"
         >
           <MenuItem value="">
             <em>None</em>

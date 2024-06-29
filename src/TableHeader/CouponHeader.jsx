@@ -6,7 +6,7 @@ import DateRange from './DatePicker'
 import CouponStatus from './CouponStatus'
 import CouponType from './CouponType'
 
-function CouponHeader({rowsPerPage,setRowsPerPage,setSearchQuery,setDateRange,setCoupon,coupon}) {
+function CouponHeader({rowsPerPage,setRowsPerPage,setSearchQuery,setDateRange,setCoupon,coupon,couponStatus,setCouponStatus}) {
   return (
     <div className='table-headers'>
         <div className="show-rows-per-page">
@@ -24,7 +24,7 @@ function CouponHeader({rowsPerPage,setRowsPerPage,setSearchQuery,setDateRange,se
         <CouponType coupon={coupon} setCoupon={setCoupon}/>
         </div>
         <div className="payment-status">
-        <CouponStatus/>
+        <CouponStatus setCouponStatus={setCouponStatus} couponStatus={couponStatus}/>
         </div>
        </div>
     </div>
