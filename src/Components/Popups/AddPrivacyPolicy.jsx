@@ -1,28 +1,49 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { styled } from "@mui/material/styles";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import Input from "@mui/joy/Input";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { MultiInputTimeRangeField } from "@mui/x-date-pickers-pro/MultiInputTimeRangeField";
-import { v4 as uuidv4 } from 'uuid';  // Import the UUID package
 import { Alert } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
+import List from '@mui/joy/List';
+import ListItem from '@mui/joy/ListItem';
+import Radio from '@mui/joy/Radio';
+import RadioGroup from '@mui/joy/RadioGroup';
+import { css } from '@emotion/react'; // Import this to use CSS in JS
 import { FiUploadCloud } from "react-icons/fi";
+// Define the styles to override the margin
+const overrideMargin = css`
+  .marginClass {
+    margin-block-start: 0 !important;
+  }
+`;
 
-export default function AddAppointment({ open, handleClose,title,btnText,editedRow }) {
+export default function AddPrivacyPolicy({ open, handleClose, title, btnText, editedRow }) {
   const [uploadedImage, setUploadedImage] = useState(editedRow?.uploadedImage || null);
   const [timeSlots, setTimeSlots] = useState(editedRow?.timeSlots || [{ id: uuidv4(), from: "", to: "" }]);
-  const [staff, setStaff] = useState(editedRow?.staff || '');
+  const [code, setCode] = useState(editedRow?.code || '');
   const [serviceFee, setServiceFee] = useState(editedRow?.serviceFee || '');
+  const [couponType, setCouponType] = useState(editedRow?.couponType || 'Flat Discount');
+  const [discount, setDiscount] = useState(editedRow?.discount || '');
+  const [description, setDescription] = useState(editedRow?.description || '');
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+  useEffect(() => {
+    if (editedRow) {
+      setCode(editedRow.code);
+      setServiceFee(editedRow.serviceFee);
+      setUploadedImage(editedRow.uploadedImage);
+      setTimeSlots(editedRow.timeSlots || [{ id: uuidv4(), from: "", to: "" }]);
+      setCouponType(editedRow.couponType);
+      setDiscount(editedRow.discount);
+      setDescription(editedRow.description);
+    }
+  }, [editedRow]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -52,16 +73,19 @@ export default function AddAppointment({ open, handleClose,title,btnText,editedR
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!staff || !serviceFee || !uploadedImage) {
+    if (!code || !serviceFee || !uploadedImage || !discount) {
       alert("Please fill in all fields and upload a valid image file.");
       return;
     }
 
     const formData = {
-      staff,
+      code,
       serviceFee,
       uploadedImage,
-      timeSlots
+      timeSlots,
+      couponType,
+      discount,
+      description
     };
 
     console.log(formData);
@@ -71,7 +95,6 @@ export default function AddAppointment({ open, handleClose,title,btnText,editedR
       setShowSuccessAlert(false);
       handleClose();
     }, 3000);
-
   };
 
   const VisuallyHiddenInput = styled("input")({
@@ -106,101 +129,49 @@ export default function AddAppointment({ open, handleClose,title,btnText,editedR
       <DialogTitle sx={{ textAlign: "center" }}>{title}</DialogTitle>
       <hr/>
       <DialogContent sx={{ width: "100%", display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <h2>Service Type</h2>
-          <Input
-            sx={{ marginTop: "5px" }}
-            size="lg"
-            placeholder="Hair Cutting & Styling"
-            name="serviceType"
-          />
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            marginTop: "10px",
-          }}
-        >
-          <div
-            className="add-slots"
-            style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <h2>Add Slots</h2>
-            <h3 style={{ color: "#082D4A", cursor: 'pointer' }} onClick={handleAddMoreSlots}>
-              + Add More Slots
-            </h3>
-          </div>
-          <div className="time">
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer
-                components={[
-                  "MultiInputTimeRangeField",
-                  "SingleInputTimeRangeField",
-                ]}
-              >
-                {timeSlots.map((slot, index) => (
-                  <Box
-                    key={slot.id}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                    }}
-                  >
-                    <MultiInputTimeRangeField
-                      slotProps={{
-                        textField: ({ position }) => ({
-                          label:
-                            position === "start"
-                              ? `From Slot ${index + 1}`
-                              : `To Slot ${index + 1}`,
-                        }),
-                      }}
-                    />
-                    {timeSlots.length > 1 && (
-                      <Button
-                        onClick={() => handleDeleteSlot(slot.id)}
-                        sx={{ minWidth: "auto" }}
-                      >
-                        <DeleteIcon sx={{color:'red'}}/>
-                      </Button>
-                    )}
-                  </Box>
-                ))}
-              </DemoContainer>
-            </LocalizationProvider>
-          </div>
-        </Box>
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
-          <div className="second-row-of-staff" style={{ flex: '1' }}>
-            <h2>No.of Available Staff</h2>
-            <Input
-              sx={{ marginTop: "5px" }}
-              size="lg"
-              placeholder="10"
-              name="staff"
-              value={staff}
-              onChange={(e) => setStaff(e.target.value)}
+        
+        
+        <Box>
+          <h3>Choose Banner Position</h3>
+          <RadioGroup aria-label="Your plan" name="people" defaultValue="Middle" sx={{ width: '100%' }}>
+      <List
+        css={overrideMargin} // Apply the CSS to override margin
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '100%',
+          gap: '20px',
+          minWidth: 240,
+          '--List-gap': '0.5rem',
+          '--ListItem-paddingY': '1rem',
+          '--ListItem-radius': '8px',
+          '--ListItemDecorator-size': '32px',
+        }}
+      >
+        {['Top', 'Middle','Bottom'].map((item, index) => (
+          <ListItem variant="outlined" key={item} sx={{ flexGrow: 1, boxShadow: 'sm', display: 'flex', alignItems: 'center',}}>
+            <Radio
+              overlay
+              value={item}
+              label={item}
+              className="marginClass" // Assuming this is the class adding the margin
+              sx={{ flex: 1, flexDirection: 'row-reverse',}}
+              slotProps={{
+                action: ({ checked }) => ({
+                  sx: (theme) => ({
+                    ...(checked && {
+                      inset: -1,
+                      border: '2px solid',
+                      borderColor: theme.vars.palette.primary[500],
+                    }),
+                  }),
+                }),
+              }}
             />
-          </div>
-          <div className="service-fee" style={{ flex: '1' }}>
-            <h2>Service Fee</h2>
-            <Input
-              sx={{ marginTop: "5px" }}
-              size="lg"
-              placeholder="NRs. 25000"
-              name="serviceFee"
-              value={serviceFee}
-              onChange={(e) => setServiceFee(e.target.value)}
-            />
-          </div>
+          </ListItem>
+        ))}
+      </List>
+    </RadioGroup>
         </Box>
         <Box>
           {uploadedImage ? (
@@ -221,8 +192,6 @@ export default function AddAppointment({ open, handleClose,title,btnText,editedR
                   background: "rgba(255, 255, 255, 0.8)",
                   borderRadius: "50%",
                 }}
-                
-              
               >
                 <DeleteIcon sx={{ color: "red" }} />
               </Button>
@@ -234,11 +203,11 @@ export default function AddAppointment({ open, handleClose,title,btnText,editedR
                 width: "100%",
                 color: "#082D4A",
                 border: "3px dotted #082D4A",
-                display:'flex',
-                flexDirection:'column',
                 borderRadius: "8px",
                 height: "150px",
                 background: "#D6EBFB",
+                display:'flex',
+                flexDirection:'column',
                 "&:hover": {
                   color: "#D6EBFB",
                   backgroundColor: "#082D4A",
@@ -253,7 +222,19 @@ export default function AddAppointment({ open, handleClose,title,btnText,editedR
             </Button>
           )}
         </Box>
-        {showSuccessAlert && <Box sx={{position:"absolute", top:'80%', width:'80%',left:'8.5%'}}><Alert message={`${title} Sucessfull`} type="success" showIcon/></Box>}
+        <Box sx={{ width: '100%' }}>
+          <h3>Add Image Link</h3>
+          <Input
+            sx={{ margin: "10px 0px" }}
+            size="lg"
+            placeholder="Discount amount or discount percentage"
+            name="discount"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
+          />
+         
+        </Box>
+        {showSuccessAlert && <Box sx={{ position: "absolute", top: '80%', width: '80%', left: '8.5%' }}><Alert message={`${title} Successful`} type="success" showIcon /></Box>}
       </DialogContent>
       <DialogActions
         sx={{
@@ -277,7 +258,7 @@ export default function AddAppointment({ open, handleClose,title,btnText,editedR
             },
           }}
         >
-          {btnText}
+          {btnText? btnText : "Add"}
         </Button>
       </DialogActions>
     </Dialog>
