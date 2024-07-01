@@ -1,29 +1,37 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import axios from 'axios';
 
-export default function FormDialog({ open, handleClose }) {
-  const apiToPost = "https://retoolapi.dev/yd0z2S/data";
+export default function FormDialog({ open, handleClose, onSubmit, category }) {
+  const [formValues, setFormValues] = useState({
+    category: '',
+  });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const formJson = Object.fromEntries(formData.entries());
-    const email = formJson.category;
-
-    try {
-      await axios.post(apiToPost, { email });
-      handleClose();
-    } catch (error) {
-      console.error('Error posting data:', error);
+  useEffect(() => {
+    if (category) {
+      setFormValues({ category: category.email || category.category || '' });
+    } else {
+      setFormValues({ category: '' });
     }
+  }, [category]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
   };
-  
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onSubmit(formValues);
+  };
+
   return (
     <Dialog
       open={open}
@@ -32,13 +40,13 @@ export default function FormDialog({ open, handleClose }) {
         component: 'form',
         onSubmit: handleSubmit,
         sx: {
-          width: '500px', // Set a fixed width
-          maxWidth: 'none', // Disable the maxWidth setting to use the fixed width
-          padding: '20px', // Add padding for better spacing
-        }
+          width: '500px',
+          maxWidth: 'none',
+          padding: '20px',
+        },
       }}
     >
-      <DialogTitle>Category Name</DialogTitle>
+      <DialogTitle>{category ? 'Edit Category' : 'Create Category'}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
@@ -50,21 +58,37 @@ export default function FormDialog({ open, handleClose }) {
           type="text"
           fullWidth
           variant="standard"
+          value={formValues.category}
+          onChange={handleInputChange}
         />
       </DialogContent>
-      <DialogActions sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-        gap: '10px',
-        marginTop: '20px'
-      }}>
-        <Button type="submit" sx={{ width: '100%', color: 'white', background: '#082D4A', '&:hover': {
-              backgroundColor: '#064a6a', // Darker shade on hover
-            } }}>Create Category</Button>
-        <Button onClick={handleClose} sx={{ width: '100%', color: 'red', border: '1px solid red' }}>Cancel</Button>
+      <DialogActions
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          gap: '10px',
+          marginTop: '20px',
+        }}
+      >
+        <Button
+          type="submit"
+          sx={{
+            width: '100%',
+            color: 'white',
+            background: '#082D4A',
+            '&:hover': {
+              backgroundColor: '#064a6a',
+            },
+          }}
+        >
+          {category ? 'Update Category' : 'Create Category'}
+        </Button>
+        <Button onClick={handleClose} sx={{ width: '100%', color: 'red', border: '1px solid red' }}>
+          Cancel
+        </Button>
       </DialogActions>
     </Dialog>
   );

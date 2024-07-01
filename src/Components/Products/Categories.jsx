@@ -10,11 +10,11 @@ function Categories() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const apiToFetchCategories = "https://retoolapi.dev/yd0z2S/data";
+  const apiToPost = "https://retoolapi.dev/yd0z2S/data";
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -30,21 +30,18 @@ function Categories() {
   }, []);
 
   const openDialog = () => {
+    setSelectedCategory(null); // Clear selected category for adding a new category
     setIsDialogOpen(true);
   };
 
   const closeDialog = () => {
     setIsDialogOpen(false);
+    setSelectedCategory(null); // Clear selected category on close
   };
 
   const openEditDialog = (category) => {
     setSelectedCategory(category);
-    setIsEditDialogOpen(true);
-  };
-
-  const closeEditDialog = () => {
-    setSelectedCategory(null);
-    setIsEditDialogOpen(false);
+    setIsDialogOpen(true);
   };
 
   const openConfirmDialog = (categoryId) => {
@@ -74,6 +71,27 @@ function Categories() {
     }
   };
 
+  const handleFormSubmit = async (formData) => {
+    if (selectedCategory) {
+      // Update existing category
+      try {
+        const response = await axios.put(`${apiToPost}/${selectedCategory.id}`, formData);
+        setCategories(categories.map(category => (category.id === selectedCategory.id ? response.data : category)));
+      } catch (error) {
+        console.error('Error updating category:', error);
+      }
+    } else {
+      // Add new category
+      try {
+        const response = await axios.post(apiToPost, formData);
+        setCategories([...categories, response.data]);
+      } catch (error) {
+        console.error('Error adding category:', error);
+      }
+    }
+    closeDialog();
+  };
+
   return (
     <div className='product-categories'>
       <div className="product-categories-header">
@@ -84,7 +102,12 @@ function Categories() {
         <div className="product-categories-header-btn">
           <button className='btn' variant="contained" onClick={openDialog}>+ Create Categories</button>
         </div>
-        <FormDialog open={isDialogOpen} handleClose={closeDialog} />
+        <FormD ialog
+          open={isDialogOpen}
+          handleClose={closeDialog}
+          onSubmit={handleFormSubmit}
+          category={selectedCategory}
+        />
       </div>
       <TableContainer component={Paper}>
         <Table>
@@ -97,7 +120,7 @@ function Categories() {
           <TableBody>
             {categories.map(category => (
               <TableRow key={category.id}>
-                <TableCell>{category.categories || category.email}</TableCell>
+                <TableCell>{category.email || category.category}</TableCell>
                 <TableCell>
                   <IconButton color="primary" onClick={() => openEditDialog(category)}>
                     <EditIcon />
@@ -114,13 +137,6 @@ function Categories() {
           </TableBody>
         </Table>
       </TableContainer>
-      {selectedCategory && (
-        <FormDialog
-          open={isEditDialogOpen}
-          handleClose={closeEditDialog}
-          category={selectedCategory}
-        />
-      )}
       <Dialog open={isConfirmDialogOpen} onClose={closeConfirmDialog}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
