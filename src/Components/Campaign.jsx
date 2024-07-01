@@ -5,6 +5,7 @@ import AddBanner from './Popups/AddBanner';
 import AddPrivacyPolicy from './Popups/AddPrivacyPolicy';
 import AddFAQs from './Popups/AddFAQs';
 import Banner from './Campaign/Banner';
+import FAQs from './Campaign/Faq';
 
 function Campaign() {
   const [openDialog, setOpenDialog] = useState(null); // State to manage which dialog is open
@@ -41,8 +42,8 @@ function Campaign() {
         <ColorTabs onTabChange={handleTabChange} />
         <div className="table-body">
           {selectedTab === 'one' && <Banner />}
-          {/* {selectedTab === 'two' && <Policies />}
-          {selectedTab === 'three' && <FAQs />} */}
+          {/* {selectedTab === 'two' && <Policies />} */}
+          {selectedTab === 'three' && <FAQs />}
         </div>
       </div>
 

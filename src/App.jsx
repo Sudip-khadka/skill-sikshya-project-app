@@ -22,7 +22,7 @@ function App() {
       <SearchProvider>
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<div>Welcome to Cnex Admin DashBoard</div>} />
+        <Route path="/" element={<div>Welcome to Cnex Admin DashBoard This Site is currently being Built so samoe features might not yet be available</div>} />
         <Route path="/products" element={<Products />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/variations" element={<Variations />} />
