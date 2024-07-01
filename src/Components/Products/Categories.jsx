@@ -102,7 +102,7 @@ function Categories() {
         <div className="product-categories-header-btn">
           <button className='btn' variant="contained" onClick={openDialog}>+ Create Categories</button>
         </div>
-        <FormD ialog
+        <FormDialog ialog
           open={isDialogOpen}
           handleClose={closeDialog}
           onSubmit={handleFormSubmit}
