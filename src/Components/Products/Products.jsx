@@ -1,11 +1,83 @@
-import React from 'react'
+// Products.js
+import React from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { Card, Button, Row, Col } from 'antd';
+
+const apiUrl ='https://retoolapi.dev/0pwl39/data';
+
+// Fetching products function
+const fetchProducts = async () => {
+  const { data } = await axios.get(apiUrl);
+  return data;
+};
+
+// Adding a product function
+const addProduct = async (newProduct) => {
+  const { data } = await axios.post(apiUrl, newProduct);
+  return data;
+};
 
 function Products() {
+  const queryClient = useQueryClient();
+
+  // Fetching products with useQuery
+  const { data, error, isLoading, isError } = useQuery({
+    queryKey: ['products'],
+    queryFn: fetchProducts,
+  });
+
+  // Adding a product with useMutation
+  const mutation = useMutation({
+    mutationFn: addProduct,
+    onSuccess: () => {
+      // Invalidate and refetch products query on success
+      queryClient.invalidateQueries(['products']);
+    },
+  });
+
+  // Function to handle adding a product
+  const handleAddProduct = () => {
+    mutation.mutate({
+      name: 'New Product',
+      price: 100,
+      rating: '⭐️⭐️⭐️⭐️⭐️',
+      'product id': 'SKU_NEW'
+    });
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
-    <div>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae tenetur magni quos dolore mollitia veritatis hic? Ab magnam nisi necessitatibus aliquam illum, illo dolorem ipsam ut minus dolorum quam quas tenetur optio veniam, expedita iusto. Vitae fuga quod harum explicabo, voluptas aut error consequatur dolores est voluptate. Consequuntur nobis autem vero! Veniam deleniti doloremque iste illum asperiores itaque facilis blanditiis magni obcaecati debitis, aut fuga deserunt a non ipsa dolores, perspiciatis iure in, sequi rem aliquam sunt alias! Reiciendis in veniam voluptates error fugiat. Officia dolore praesentium dignissimos iure minus esse itaque debitis? Voluptate debitis aspernatur possimus saepe, doloribus corrupti? Molestiae laudantium magni, assumenda sint ipsa nam, aperiam pariatur natus quas repudiandae, impedit aliquid rerum nobis porro minus! Consectetur nemo ex at assumenda quasi a nobis itaque eum debitis repellendus, doloremque eos quod quisquam fugiat molestiae sit nesciunt optio necessitatibus porro quam accusamus omnis aliquid labore! Qui soluta, hic earum tenetur excepturi deleniti nisi nostrum consequuntur? Pariatur deleniti assumenda ratione blanditiis voluptate voluptates officia accusantium ipsa incidunt? Ipsa officiis architecto natus delectus amet nulla cumque voluptatem sequi tenetur incidunt, deleniti doloribus accusamus dolores nemo minima. Quo rerum, architecto impedit repellat animi consequatur accusamus distinctio corrupti alias modi. Dolorem, itaque alias.</p>
+    <div style={{ padding: '20px' }}>
+      <h1>Products</h1>
+      <Button type="primary" onClick={handleAddProduct} disabled={mutation.isLoading}>
+        {mutation.isLoading ? 'Adding...' : 'Add Product'}
+      </Button>
+      {mutation.isError ? <div>Error adding product: {mutation.error.message}</div> : null}
+      <Row gutter={[16, 16]} style={{ marginTop: '20px' }}>
+        {data.map(product => (
+          <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
+            <Card
+              title={product.name}
+              bordered={false}
+              style={{ width: '100%' }}
+              extra={<span>{product.rating}</span>}
+            >
+              <p>Price: ${product.price}</p>
+              <p>Product ID: {product['product id']}</p>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </div>
-  )
+  );
 }
 
-export default Products
+export default Products;

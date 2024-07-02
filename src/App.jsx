@@ -17,8 +17,11 @@ import Rating from './Components/Rating';
 import ManageAppointments from './Components/Appointments/ManageAppointments';
 import { SearchProvider } from './Components/Context/StateManagement';
 
+
+
 function App() {
   return (
+    
       <SearchProvider>
     <Routes>
       <Route element={<Layout />}>
