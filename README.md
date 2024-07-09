@@ -1,4 +1,4 @@
-![image](https://github.com/Sudip-khadka/skill-sikshya-project-app/assets/107389556/bb2088a4-f0a2-42a0-ae2d-2ce16fd0e333)# React + Vite
+# React + Vite
 
 ## This site is currently under development (stoped for some time)
 Find Live App At :-
